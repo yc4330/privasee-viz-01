@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Policy Patterns</title>
+    <style>
+        .rectangle {
+            fill: rgb(232, 225, 217);
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 5px;
+            font: 28px sans-serif;
+            font-style: bold;
+            background: rgb(255, 255, 255);
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .tooltip2 {
+            position: absolute;
+            text-align: left;
+            width: 400px;
+            padding: 5px;
+            font: 20px sans-serif;
+            background: rgb(254, 212, 212);
+            border: 0px;
+            border-radius: 2px;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .tooltip3 {
+            position: absolute;
+            text-align: left;
+            width: 400px;
+            padding: 5px;
+            font: 20px sans-serif;
+            background: rgb(237, 255, 227);
+            border: 0px;
+            border-radius: 2px;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .red {
+            color: red;
+        }
+        .green {
+            color: green;
+        }
+        .fixed-title {
+            position: fixed;
+            top: 10px;
+            left: 30px;
+            background: white;
+            z-index: 1000; /* Ensures the title stays on top */
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .fixed-title2 {
+            position: fixed;
+            top: 25px;
+            left: 600px;
+            font-size: 15px;
+            background: white;
+            z-index: 1000; /* Ensures the title stays on top */
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <div id="tooltip" class="tooltip"></div>
+    <div id="tooltip2" class="tooltip2"></div>
+    <div id="tooltip3" class="tooltip3"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <h2 class="fixed-title">
+        <span class="red">AI</span> and <span class="green">Third-party</span> in Top 100 privacy policies
+    </h2>
+    <h3 class="fixed-title2">
+        <a href="faces.html">Click to view how GPT scores them</a>
+    </h3>
+    <script>
+        // Define the size of each triangle
+        const rectWidth = 50;
+const rectHeight = 700;
+const margin = 10;
+
+// Define the SVG area dimensions
+const svgWidth = (rectWidth + margin) * 100;
+const svgHeight = rectHeight + 2 * margin;
+
+const tooltip = d3.select("#tooltip");
+const tooltip2 = d3.select("#tooltip2");
+const tooltip3 = d3.select("#tooltip3");
+
+// Create an SVG container
+const svg = d3.select("body")
+    .append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
+
+// Load the CSV file
+d3.json("search_results.json").then(data => {
+    data.forEach((d, i) => {
+        // Calculate the position of each rectangle
+        const x = i * (rectWidth + margin) + margin;
+        const y = margin*8;
+        // Append the rectangle to the SVG container
+        const app = svg.append("rect")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("width", rectWidth)
+            .attr("height", rectHeight)
+            .attr("class", "rectangle")
+            
+        app.on("mouseover", function() {
+                tooltip.style("visibility", "visible")
+                       .text(d.name);
+            })
+            .on("mousemove", function(event) {
+                tooltip.style("top", (event.pageY - 10) + "px")
+                       .style("left", (event.pageX + 10) + "px");
+            })
+            .on("mouseout", function() {
+                tooltip.style("visibility", "hidden");
+            });
+
+        // for each sentence in d.search_results, create a rectangle, x=x, y=y+rectHeight/d.count*d.searchresults[0], width=rectWidth, height=rectHeight/d.count, class=highlight
+        d.AI.forEach((sentence, j) => {
+            const high = svg.append("rect")
+                .attr("x", x)
+                .attr("y", y + rectHeight / d.count * sentence[0])
+                .attr("width", rectWidth)
+                .attr("height", rectHeight / d.count)
+                .attr("class", "highlight")
+                .attr("fill", "red");
+
+            high.on("mouseover", function() {
+                tooltip2.style("visibility", "visible")
+                       .text(sentence[1]);
+            })
+            .on("mousemove", function(event) {
+                tooltip2.style("top", (event.pageY - 10) + "px")
+                       .style("left", (event.pageX + 10) + "px");
+            })
+            .on("mouseout", function() {
+                tooltip2.style("visibility", "hidden");
+            });
+        });
+
+        d.Thirdparty.forEach((sentence, j) => {
+            console.log(sentence)
+            const high2 = svg.append("rect")
+                .attr("x", x)
+                .attr("y", y + rectHeight / d.count * sentence[0])
+                .attr("width", rectWidth)
+                .attr("height", rectHeight / d.count)
+                .attr("class", "highlight")
+                .attr("fill", "#66cc00");
+
+            high2.on("mouseover", function() {
+                tooltip3.style("visibility", "visible")
+                       .text(sentence[1]);
+            })
+            .on("mousemove", function(event) {
+                tooltip3.style("top", (event.pageY - 10) + "px")
+                       .style("left", (event.pageX + 10) + "px");
+            })
+            .on("mouseout", function() {
+                tooltip3.style("visibility", "hidden");
+            });
+        });
+    });
+}).catch(error => {
+    console.error('Error loading or parsing CSV file:', error);
+});
+    </script>
+</body>
+</html>
